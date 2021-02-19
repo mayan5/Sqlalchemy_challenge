@@ -7,7 +7,8 @@ import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
-from flask import Flask, jsonify
+from flask import Flask, jsonify 
+from sqlalchemy import desc
 
 
 
@@ -54,7 +55,7 @@ def welcome():
 @app.route("//api/v1.0/precipitation")
 def precipitation():
     precep_scores = session.query(measurement.date, measurement.prcp).\
-    filter(measurement.date > '2016-08-23').\
+    filter(measurement.date > '2016-08-22').\
     order_by(measurement.date).all()
     rain_totals = []
     for result in precep_scores:
@@ -68,26 +69,20 @@ def precipitation():
 
 @app.route("//api/v1.0/stations")
 def stations():
-    stations = session.query(station.station, station.name)
-    station_list = []
-    for station_ in stations:
-        row = {}
-        row["station_number"] = stations[0]
-        row["station_name"] = stations[1]
-        station_list.append(row)
+    results = session.query(measurement.station).group_by(measurement.station).all()
+    all_sessions = list(np.ravel(results))
+    return jsonify(all_sessions)
 
-    return jsonify(station_list)
 
 @app.route("//api/v1.0/tobs")
 def tobs():
     active_station_scores = session.query(measurement.date, measurement.tobs).\
-    filter(measurement.date > '2016-08-23').\
-    order_by(measurement.date).all()
+    filter(measurement.date > '2016-08-24').all()
     tobs_list = []
     for score in active_station_scores:
         row = {}
-        row["date"] = active_station_scores[0]
-        row["tobs"] = active_station_scores[1]
+        row["date"] = score[0]
+        row["tobs"] = score[1]
         tobs_list.append(row)
     return jsonify(tobs_list)
 
