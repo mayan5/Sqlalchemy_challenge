@@ -13,7 +13,7 @@ from sqlalchemy import desc
 
 
 Base = automap_base()
-engine = create_engine("sqlite:///C:/Users/Marisabel Matta/Desktop/hawaii.sqlite",echo= False)
+engine = create_engine("sqlite:///hawaii.sqlite",echo= False)
 Base.prepare(engine, reflect=True)
 measurement = Base.classes.measurement
 station = Base.classes.station
